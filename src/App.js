@@ -7,7 +7,6 @@ function App() {
     <>
       <Routes>
         <Route path="/" element={<Main />} />
-        <Route path="todo" element={<Main />} />
         <Route path="todo/:id" element={<TodoDetails />} />
       </Routes>
     </>

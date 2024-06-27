@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import check from '../images/check-mark-10120.png';
 import cancel from '../images/red-x-10340.png';
 
@@ -12,7 +13,9 @@ const TodoItem = ({ todo, onCheck, onDeleteClicked }) => {
                         todo.isChecked && <img src={check} className='w-full h-full' alt='' />
                     }
                 </div>
-                <p style={{ color: todo.color }}>{todo.text}</p>
+                <Link to={`todo/${todo.id}`}>
+                    <p style={{ color: todo.color }}>{todo.text}</p>
+                </Link>
             </div>
             <div>
                 <div className='w-[30px] aspect-square p-1 cursor-pointer' onClick={() => onDeleteClicked(todo.id)}>
