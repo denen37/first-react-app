@@ -3,29 +3,24 @@ import { useEffect, useState } from 'react';
 import TodoItem from '../components/TodoItem';
 import { useImmer } from "use-immer";
 import Header from '../components/Header';
+import { useSelector } from 'react-redux';
+import { todoAdded, todoChecked } from '../features/todos/todosSlice';
+import { useDispatch } from 'react-redux';
 
-let initialState = [
-    { id: 2, text: "Learn React", color: "black", isChecked: true },
-    { id: 3, text: "Learn Redux", color: "blue", isChecked: false },
-    { id: 1, text: "Build Something Cool", color: "red", isChecked: false }
-]
 
 const Main = () => {
     const [inputValue, setInputValue] = useState('');
-    const [todoList, updateTodoList] = useImmer(initialState);
+    const todos = useSelector(state => state.todos)
+    const dispatch = useDispatch();
 
     const handleCheck = (id) => {
-
-        updateTodoList((list) => {
-            const todo = list.find(obj => obj.id === id)
-            todo.isChecked = !todo.isChecked
-        })
+        dispatch(todoChecked(id));
     }
 
     const handleCheckAll = (state) => {
-        updateTodoList((list) => {
-            list.forEach(item => item.isChecked = state)
-        })
+        // updateTodoList((list) => {
+        //     list.forEach(item => item.isChecked = state)
+        // })
     }
 
     const handleChange = (e) => {
@@ -36,22 +31,18 @@ const Main = () => {
         const trimmedText = e.target.value.trim()
 
         if (e.key === 'Enter' && trimmedText) {
-            let newId = Math.max(...todoList.map(item => item.id)) + 1
+            let newId = Math.max(...todos.map(item => item.id)) + 1
 
-            updateTodoList(list => {
-                list.push({ id: newId, text: trimmedText, color: 'black' })
-            })
+            dispatch(todoAdded(
+                { id: newId, text: trimmedText, color: "black", isChecked: false }
+            ))
             setInputValue('');
         }
     }
 
     const handleDelete = (id) => {
-        updateTodoList(() => todoList.filter(item => item.id !== id))
+        // updateTodoList(() => todoList.filter(item => item.id !== id))
     }
-
-    // useEffect(() => {
-
-    // }, [todoList])
 
     return (
         <div className="w-8/12 mx-auto py-4 bg-white min-h-screen flex flex-col">
@@ -65,7 +56,7 @@ const Main = () => {
                 </div>
                 <div className='mt-2'>
                     {
-                        todoList && todoList.map((item, index) => <div key={Math.random()}>
+                        todos.map((item, index) => <div key={Math.random()}>
                             <TodoItem todo={item} onCheck={handleCheck} onDeleteClicked={handleDelete} />
                         </div>)
                     }
