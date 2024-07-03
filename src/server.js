@@ -1,9 +1,8 @@
 import { createServer } from "miragejs"
 
-export default function () {
+export default function mockApi() {
     createServer({
         routes() {
-            this.namespace = ""
 
             this.get("/movies", () => {
                 return {

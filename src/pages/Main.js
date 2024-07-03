@@ -4,8 +4,9 @@ import TodoItem from '../components/TodoItem';
 import { useImmer } from "use-immer";
 import Header from '../components/Header';
 import { useSelector } from 'react-redux';
-import { todoAdded, todoChecked } from '../features/todos/todosSlice';
+import { todoAdded, todoChecked, todoDeleted, todoToggleAll } from '../features/todos/todosSlice';
 import { useDispatch } from 'react-redux';
+import axios from 'axios';
 
 
 const Main = () => {
@@ -18,9 +19,7 @@ const Main = () => {
     }
 
     const handleCheckAll = (state) => {
-        // updateTodoList((list) => {
-        //     list.forEach(item => item.isChecked = state)
-        // })
+        dispatch(todoToggleAll(state));
     }
 
     const handleChange = (e) => {
@@ -41,8 +40,23 @@ const Main = () => {
     }
 
     const handleDelete = (id) => {
-        // updateTodoList(() => todoList.filter(item => item.id !== id))
+        dispatch(todoDeleted(id));
     }
+
+    useEffect(() => {
+        axios.get('/movies')
+            .then(function (response) {
+                // handle success
+                console.log(response);
+            })
+            .catch(function (error) {
+                // handle error
+                console.log(error);
+            })
+            .finally(function () {
+                // always executed
+            });
+    })
 
     return (
         <div className="w-8/12 mx-auto py-4 bg-white min-h-screen flex flex-col">
