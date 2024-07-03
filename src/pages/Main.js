@@ -5,13 +5,19 @@ import { useImmer } from "use-immer";
 import Header from '../components/Header';
 import { useSelector } from 'react-redux';
 import { todoAdded, todoChecked, todoDeleted, todoToggleAll } from '../features/todos/todosSlice';
+import { fetchAllTodos } from '../features/todos/todosSlice';
 import { useDispatch } from 'react-redux';
 import axios from 'axios';
 
 
 const Main = () => {
     const [inputValue, setInputValue] = useState('');
-    const todos = useSelector(state => state.todos)
+    const todos = useSelector(state => state.todos.data)
+    const status = useSelector(state => state.todos.status)
+    const error = useSelector(state => state.todos.error)
+
+
+
     const dispatch = useDispatch();
 
     const handleCheck = (id) => {
@@ -30,11 +36,24 @@ const Main = () => {
         const trimmedText = e.target.value.trim()
 
         if (e.key === 'Enter' && trimmedText) {
-            let newId = Math.max(...todos.map(item => item.id)) + 1
+            // let newId = Math.max(...todos.map(item => item.id)) + 1
 
-            dispatch(todoAdded(
-                { id: newId, text: trimmedText, color: "black", isChecked: false }
-            ))
+            // dispatch(todoAdded(
+            //     { id: newId, text: trimmedText, color: "black", isChecked: false }
+            // ))
+
+            // axios.post('/todos', {
+            //     text: trimmedText,
+            //     color: 'black',
+            //     isChecked: false,
+            // })
+            //     .then(result => setTodos((todos) => {
+            //         console.log(result);
+            //         todos.push(result.data.todo);
+            //     }))
+            //     .catch(err => console.log(err))
+            //     .finally(() => console.log('End Execution'))
+
             setInputValue('');
         }
     }
@@ -44,19 +63,14 @@ const Main = () => {
     }
 
     useEffect(() => {
-        axios.get('/movies')
-            .then(function (response) {
-                // handle success
-                console.log(response);
-            })
-            .catch(function (error) {
-                // handle error
-                console.log(error);
-            })
-            .finally(function () {
-                // always executed
-            });
-    })
+        console.log(todos)
+    }, [todos])
+
+    useEffect(() => {
+        if (status === 'idle') {
+            dispatch(fetchAllTodos());
+        }
+    }, [])
 
     return (
         <div className="w-8/12 mx-auto py-4 bg-white min-h-screen flex flex-col">
@@ -70,9 +84,24 @@ const Main = () => {
                 </div>
                 <div className='mt-2'>
                     {
-                        todos.map((item, index) => <div key={Math.random()}>
+                        status === 'loading' &&
+                        <p className='text-center text-blue-400 text-2xl'>Loading...</p>
+                    }
+                    {
+                        status === 'succeeded' &&
+                        todos[0].todos.length > 0 &&
+                        todos[0].todos.map((item, index) => <div key={index}>
                             <TodoItem todo={item} onCheck={handleCheck} onDeleteClicked={handleDelete} />
                         </div>)
+                    }
+                    {
+                        status === 'succeeded' &&
+                        todos[0].todos.length == 0 &&
+                        <p className='text-center text-gray-400 text-2xl'>There are no todos yet</p>
+                    }
+                    {
+                        status === 'failed' &&
+                        <p className='text-center text-2xl text-red-400'>There seems to be a problem fetching todos</p>
                     }
                 </div>
             </div>
